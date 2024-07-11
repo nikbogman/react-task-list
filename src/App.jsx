@@ -5,7 +5,7 @@ import {
 } from "react-router-dom";
 import Tasks from "./routes/tasks";
 import About from "./routes/about";
-import { GlobalStateProvider } from "./context";
+import { GlobalStateProvider } from "./components/global-state-provider";
 import Layout from "./components/layout";
 export default function App() {
     return <GlobalStateProvider Root={() =>

@@ -1,5 +1,4 @@
 import { Box } from "@mui/material";
-import { useGlobalState } from "../context";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import {
@@ -11,42 +10,42 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import SaveIcon from '@mui/icons-material/Save';
 
 import { useState } from "react";
+import { useTasks } from "../hooks/tasks";
 
 export default function Task({ id, text, done }) {
-    const { tasks } = useGlobalState();
+    const { update, remove } = useTasks();
 
     const [isEditing, setIsEditing] = useState(false);
     const [editedText, setEditedText] = useState(text);
 
-    const remove = () => {
-        GlobalState.set({
-            tasks: [...tasks.filter(t => t.id !== id)]
-        })
-    }
+    const RemoveButton = () => (
+        <IconButton color="error" onClick={() => remove(id)}>
+            <DeleteIcon />
+        </IconButton>
+    )
 
-    const changeDone = (e) => {
-        const idx = tasks.findIndex(t => t.id === id)
-        const updatedTasks = [...tasks];
-        updatedTasks[idx] = { id, text, done: e.target.checked }
+    const EditButton = () => (
+        <IconButton color="secondary" onClick={() => setIsEditing(true)}>
+            <EditIcon />
+        </IconButton>
+    )
 
-        GlobalState.set({
-            tasks: updatedTasks
-        })
+    const CancelButton = () => (
+        <IconButton color="error" onClick={() => setIsEditing(false)}>
+            <CancelIcon />
+        </IconButton>
+    )
 
-    }
+    const SaveButton = () => (
+        <IconButton color="success" onClick={() => {
+            update(id, { text: editedText })
+            setEditedText(editedText)
+            setIsEditing(false)
+        }}>
+            <SaveIcon />
+        </IconButton>
+    )
 
-    const update = () => {
-        const idx = tasks.findIndex(t => t.id === id)
-        const updatedTasks = [...tasks];
-        updatedTasks[idx] = { id, text: editedText, done }
-
-        GlobalState.set({
-            tasks: updatedTasks
-        })
-
-        setEditedText(editedText)
-        setIsEditing(false)
-    }
 
     return <Box
         sx={{
@@ -60,52 +59,38 @@ export default function Task({ id, text, done }) {
         <Checkbox
             disabled={isEditing}
             checked={done}
-            onChange={changeDone}
+            onChange={(e) => update(id, { done: e.target.checked })}
             sx={{ "& .MuiSvgIcon-root": { fontSize: 28 } }}
         />
 
-        {isEditing ? <>
-            <TextField
-                label={text}
-                size="small"
-                value={editedText}
-                onChange={(e) => {
-                    e.preventDefault();
-                    setEditedText(e.target.value);
-                }}
-                variant="filled"
-            />
+        {isEditing ? <TextField
+            label={text}
+            size="small"
+            value={editedText}
+            onChange={(e) => {
+                e.preventDefault();
+                setEditedText(e.target.value);
+            }}
+            variant="filled"
+        /> : <p>{text}</p>}
 
-            <Box
-                sx={{
-                    display: "flex",
-                    gap: 1,
-                }}
-            >
-                <IconButton color="success" onClick={update}>
-                    <SaveIcon />
-                </IconButton>
-                <IconButton color="error" onClick={() => setIsEditing(false)}>
-                    <CancelIcon />
-                </IconButton>
-            </Box>
-        </> : <>
-            {text}
 
-            <Box
-                sx={{
-                    display: "flex",
-                    gap: 1,
-                }}
-            >
-                <IconButton color="secondary" onClick={() => setIsEditing(true)}>
-                    <EditIcon />
-                </IconButton>
-                <IconButton color="error" onClick={remove}>
-                    <DeleteIcon />
-                </IconButton>
-            </Box>
-        </>
-        }
+        <Box
+            sx={{
+                display: "flex",
+                gap: 1,
+            }}
+        >
+            {isEditing ?
+                <>
+                    <SaveButton />
+                    <CancelButton />
+                </> : <>
+                    <EditButton />
+                    <RemoveButton />
+                </>}
+
+        </Box>
+
     </Box>
 }

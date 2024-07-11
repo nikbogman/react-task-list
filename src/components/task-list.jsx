@@ -4,8 +4,8 @@ import {
     Stack,
     styled,
 } from "@mui/material";
-import { useGlobalState } from "../context";
 
+import { useTasks } from "../hooks/tasks";
 import Task from "./task";
 
 const Item = styled(Paper)(({ theme }) => ({
@@ -17,7 +17,7 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 export default function TaskList() {
-    const { tasks } = useGlobalState()
+    const { tasks } = useTasks()
 
 
     return (

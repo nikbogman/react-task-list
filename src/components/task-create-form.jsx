@@ -1,25 +1,14 @@
 import { useState } from "react";
-import { useGlobalState } from "../context";
 
 import { Box, TextField, Fab } from "@mui/material";
 
 import AddIcon from "@mui/icons-material/Add";
 
+import { useTasks } from "../hooks/tasks";
+
 export default function TaskCreateForm() {
-    const { tasks } = useGlobalState();
-
+    const { add } = useTasks();
     const [text, setText] = useState("");
-
-    const add = () => {
-        GlobalState.set({
-            tasks: [...tasks, {
-                id: Date.now().toString(),
-                text,
-                done: false
-            }]
-        })
-        setText("")
-    };
 
     return (
         <Box
@@ -43,7 +32,10 @@ export default function TaskCreateForm() {
                 }}
             />
             <Box sx={{ "& > :not(style)": { m: 1 } }}>
-                <Fab color="primary" onClick={(e) => add()}>
+                <Fab color="primary" onClick={(e) => {
+                    add(text)
+                    setText("")
+                }}>
                     <AddIcon />
                 </Fab>
             </Box>
